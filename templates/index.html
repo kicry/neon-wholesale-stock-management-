@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block body %}
+<style>
+  .material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 20,
+  }
+</style>
+
+    <div class="content-wrapper">
+    {% include 'message.html' %}
+
+    <div class="row">
+        <div class="col-md-5 grid-margin">
+        <div class="card">
+            <div class="card-body">
+            <h4 class="card-title">Add To Cart Items </h4>
+            <form class="forms-sample" method="post" action="{% url 'Additem' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Select Product</label>
+                    <input id="pid" name="pid" class="form-control rounded-0" list="items">
+                        <datalist id="items">
+                        <option value="" selected="selected" disabled="disabled"></option>
+                        {% for product in products %}
+                            <option value="{{ product.name }}" data-price="{{ product.price }}">{{ product }}</option>
+                        {% endfor %}
+                        </datalist>
+                </div>
+
+                <div class="form-group">
+                    <label for="itemsize">Product Size</label>
+                    <select class="form-control" id="itemsize" name="itemsize" id="sizeselect" disabled>
+                        <option value="" selected disabled>Please select a product first</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="itemprice">Product Price</label>
+                    <input type="text" class="form-control" id="itemprice" name="itemprice" placeholder="Product Price" disabled>
+                </div>
+                <div class="form-group">
+                <label for="quntity">Select Quantity</label>
+                <input type="number" class="form-control" name="quantity" id="quntity" placeholder="Quntity">
+                </div>
+                <button type="submit" id="add_to_list" class="btn btn-primary me-2">Add</button>
+            </form>
+            </div>
+        </div>
+        </div>
+        <div class="col-md-7 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Your Cart Items</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="product-tbl" name="product-tbl">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Product</th>
+                                    <th>Product Size</th>
+                                    <th>Product Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total cost</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    {% for bill_item in bill_items %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ bill_item.tempname }}</td>
+                                        <td>{{ bill_item.tempsize }}</td>
+                                        <td>{{ bill_item.tempprice }}</td>
+                                        <td>{{ bill_item.tempquntity }}</td>
+                                        <td>Ksh. {{ bill_item.temptotal }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-outline-danger me-1 btn-sm" href="{% url 'Deletetempitem' bill_item.id %}" data-bs-toggle="modal" data-bs-target="#mydelete{{forloop.counter}}"><span class="mdi mdi-delete"></span></button>
+                                            <div class="modal" id="mydelete{{forloop.counter}}" tabindex="-1" aria-labelledby="myModalLabel1" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">{{bill_item.tempname}}</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true"></span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Are you sure you want to delete this item?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <form action="{% url 'Deletetempitem' bill_item.id %}" method="POST">
+                                                            {% csrf_token %}
+                                                            <input type="submit" class="btn btn-primary" value="Delete">
+                                                        </form>
+                                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="4"><b>Total</b></th>
+                                    <th colspan="2">
+                                        <input type="hidden" name="total" value="0">
+                                        Ksh. <span class="fw-bold" id="total_price">{{total_price.total_price}}</span>
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                        <form method="post" action="{% url 'Createbill' %}">
+                            {% csrf_token %}
+                            <div class="form-group row mt-2 mb-0">
+                                <div class="col-sm">
+                                    <label for="custname"><h5 class="pt-2">Customer Name</h5></label>
+                                    <input type="text" class="form-control" name="custname" id="custname" placeholder="Customer Name">
+                                </div>
+                                <div class="col-sm">
+                                    <label for="custmobile"><h5 class="pt-2">Customer Mobile</h5></label>
+                                    <input type="number" class="form-control" name="custmobile" id="custmobile mobile-input" placeholder="Mobile Number">
+                                </div>
+                                <div class="col-sm">
+                                    <label for="custmobile"><h5 class="pt-2">Customer Email</h5></label>
+                                    <input type="email" class="form-control" name="custemail" id="custemail" placeholder="Email">
+                                </div>
+                                </div>
+                                <div class="mt-3 row">
+                                    <div class="col-sm">
+                                        <label for="payment"><h5 class="pt-2">Payment</h5></label>
+                                        <select class="form-control" name="payment" id="payment">
+                                            <option value="1" default>Cash</option>
+                                            <option value="2">Online</option>
+                                            <option value="3">Pending</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm">
+                                        <div class="row">
+                                            <div class="col-sm">
+                                                <label for="discount"><h5 class="pt-2">Discount</h5></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text mdi mdi-cash"></span>
+                                                    <div class="col-sm">
+                                                    <input type="number" class="form-control" name="discount" id="discount" step="0.01" placeholder="Price" oninput="updateDiscount()">
+                                                    </div>
+                                                    <span class="input-group-text mdi mdi-percent"></span>
+                                                    <div class="col-sm">
+                                                    <input type="number" class="form-control" name="discount_percentage" id="discount_percentage" step="0.01" placeholder="Percentage" oninput="updatePercentage()">
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            <div class="col-sm text-end d-flex flex-row-reverse mt-2">
+                                <button type="submit" class="btn btn-primary">Create Bill</button>
+                                </form>
+                                <form method="post" action="{% url 'Deleteitem' %}">
+                                {% csrf_token %}
+                                <button class="btn btn-light me-md-2">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+    </div>
+</div>
+</div>
+
+{% endblock body %}
+
+{% block script %}
+
+<script>
+    function updateDiscount() {
+        var orignal_price = parseFloat(document.getElementById('total_price').innerHTML);
+        var discount = parseFloat(document.getElementById('discount').value);
+        var discount_percentage = (discount * 100) / orignal_price;
+        discount_percentage = discount_percentage.toFixed(2);
+        document.getElementById('discount_percentage').value = discount_percentage;
+    }
+
+    function updatePercentage() {
+        var orignal_price = parseFloat(document.getElementById('total_price').innerHTML);
+        var discount_percentage = parseFloat(document.getElementById('discount_percentage').value);
+        var discount = orignal_price * discount_percentage / 100;
+        discount = discount.toFixed(2);
+        document.getElementById('discount').value = discount;
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#pid').change(function () {
+            var selectedProduct = $(this).val();
+            if (selectedProduct) {
+                $('#itemsize').prop('disabled', false);
+                $('#itemsize').empty();
+                $('#itemsize').append('<option value="" selected disabled>Please select a size</option>');
+                {% for product in products %}
+                    if ("{{ product.name }}" === selectedProduct) {
+                        {% if product.size %}
+                            $('#itemsize').append('<option value="{{ product.size }}">{{ product.size }}</option>');
+                        {% endif %}
+                    }
+                {% endfor %}
+            } else {
+                $('#itemsize').prop('disabled', true);
+                $('#itemsize').empty();
+                $('#itemsize').append('<option value="" selected disabled>Please select a product first</option>');
+            }
+        });
+
+        $('#itemsize').change(function () {
+            var selectedSize = $(this).val();
+            if (selectedSize) {
+                var selectedProduct = $('#pid').val();
+                {% for product in products %}
+                    if ("{{ product.name }}" === selectedProduct) {
+                        {% if product.size %}
+                            if ("{{ product.size }}" === selectedSize) {
+                                var price = "{{ product.price }}";
+                                $('#itemprice').val(price);
+                                $('#itemprice').prop('disabled', false);
+                            }
+                        {% endif %}
+                    }
+                {% endfor %}
+            } else {
+                $('#itemprice').val('');
+                $('#itemprice').prop('disabled', true);
+            }
+        });
+    });
+</script>
+{% endblock script %}

@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<div class="container pt-3">
+{% include 'message.html' %}
+<div class="card card-default border shadow rounded-0">
+    <div class="card-header">
+        <div class="w-100 d-flex justify-content-between">
+            <h5 class="fw-bolder card-title mb-0 d-flex align-items-center"><a href="{{ request.META.HTTP_REFERER }}" id="getBillArrow" class="mdi mdi-arrow-left" style="color:black;"></a> Product Stock History</h5>
+            <a class="btn btn-outline-dark me-1 btn-sm d-flex inline" type="button" data-bs-toggle="modal" data-bs-target="#addstock"><span class="mdi mdi-plus"></span>Add Stock</a>
+            <!-- Add Stock Modal -->
+            <div class="modal" id="addstock" tabindex="-1" aria-labelledby="myModalLabel1" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <form action="{% url 'addstock' product.id %}" method="POST">
+                                {% csrf_token %}
+                                <h5 class="modal-title">Add Quantity</h5>
+                        </div>
+                        <div class="modal-body">
+                            <label for="quantity" class="text-start text-wrap fs-6" style="display:flex;">Quantity of {{product.name}}</label>
+                            <input type="number" min="0" id="quantity" name="quntity" class="form-control mt-2" placeholder="Enter Number of Quantity to Add">
+                        </div>
+                        <div class="modal-footer" style="flex-direction: row;">
+                            <button type="button" class="btn" data-bs-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-primary" value="Add">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a class="btn btn-outline-dark me-1 btn-sm d-flex inline" type="button" data-bs-toggle="modal" data-bs-target="#removestock"><span class="mdi mdi-minus"></span>Remove Stock</a>
+            <div class="modal" id="removestock" tabindex="-1" aria-labelledby="myModalLabel2" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <form action="{% url 'deletestock' product.id %}" method="POST">
+                                {% csrf_token %}
+                                <h5 class="modal-title">Remove Quantity</h5>
+                        </div>
+                        <div class="modal-body">
+                            <label for="quantity" class="text-start text-wrap fs-6" style="display:flex;">Quantity of {{product.name}}</label>
+                            <input type="number" min="0" id="quantity" name="quntity" class="form-control mt-2" placeholder="Enter Number of Quantity to Remove">
+                        </div>
+                        <div class="modal-footer" style="flex-direction: row;">
+                            <button type="button" class="btn" data-bs-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-primary" value="Remove">
+                            </form>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="card-body">
+        <div class="container-fluid">
+            <fieldset class="border-bottom">
+                <legend>Product Details</legend>
+                <dl>
+                    <div class="row">
+                        <div class="col-md">
+                            <dt class="text-secondary h6">Name</dt>
+                            <dd class="fw-bold mt-1 h6">{{ product.name }}</dd>
+                        </div>
+                        <div class="col-md mt-1">
+                            <dt class="text-secondary h6">Size</dt>
+                            <dd class="fw-bold mt-1 h6">{{ product.size }}</dd>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md mt-1">
+                            <dt class="text-secondary h6">Price</dt>
+                            <dd class="fw-bold mt-1 h6">Ksh. {{ product.price }}</dd>
+                        </div>
+                        <div class="col-md mt-1">
+                            <dt class="text-secondary h6">Available Quantity</dt>
+                            <dd class="fw-bold mt-1 h6">{{ product.totalquantity }}</dd>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md mt-1">
+                            <dt class="text-secondary h6">Status</dt>
+                            <dd class="fw-bold mt-1 h6">{% if product.status == "1" %} Active {% else %} Inactive {% endif %}</dd>
+                        </div>
+                        <div class="col-md mt-1">
+                            <dt class="text-secondary h6">Description</dt>
+                            <dd class="fw-bold mt-1 h6">{% if product.description == "" %} This product has no description {% else %} {{product.description}} {% endif %}</dd>
+                        </div>
+                    </div>
+                </dl>
+            </fieldset>
+            <fieldset>
+                <legend>History</legend>
+                <div class="table-responsive">
+                <table class="table table-bordered" id="stock-tbl">
+                    <colgroup>
+                        <col width="5%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        {% comment %} <col width="20%"> {% endcomment %}
+                    </colgroup>
+                    <thead>
+                        <th class="text-center">No.</th>
+                        <th class="text-center">Date/Time</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Type</th>
+                        {% comment %} <th class="text-center">Action</th> {% endcomment %}
+                    </thead>
+                    <tbody>
+                        {% if stocks %}
+                        {% for stock in stocks %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td class="">{{ stock.date_created|date:"d-m-Y h:i A" }}</td>
+
+                            <td class="text-center">{{ stock.itemquntity }}</td>
+                            <td class="text-center">
+                                {% if stock.status == '1' %}
+                                <span class="badge px-3 rounded-pill bg-primary bg-gradient">Stock In</span> {% else %}
+                                <span class="badge px-3 rounded-pill bg-danger bg-gradient">Stock Out</span> {% endif %}
+                            </td>
+                            {% comment %} <td class="text-center">
+                                Delete Btn
+                            </td> {% endcomment %}
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+                <thead>
+                    <tr>
+                    <td colspan="5">
+                        <div class="pagination mt-2">
+                        <ul class="pagination pagination-sm">
+                            <li class="page-item">
+                            {% if stocks.has_previous %}
+                            <a href="?page=1" class="page-link">&laquo;</a>
+                            </li>
+                            <li class="page-item">
+                            <a href="?page={{ stocks.previous_page_number }}" class="page-link">&laquo;</a>
+                            </li>
+                            {% endif %}
+                            <li class="page-item active">
+                            <span class="current-page page-link">{{ stocks.number }}</span>
+                            </li>
+                            {% if stocks.has_next %}
+                            <li class="page-item">
+                            <a href="?page={{ stocks.next_page_number }}" class="page-link">&raquo;</a>
+                            </li>
+                            <li class="page-item">
+                            <a href="?page={{ stocks.paginator.num_pages }}" class="page-link">&raquo;</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        </div>
+                    </td>
+                    </tr>
+                </thead>
+            </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock body %}

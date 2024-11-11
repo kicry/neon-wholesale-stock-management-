@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <title>Customer Bill</title>
+<style>
+    body{
+
+        background-color: #a6a6a6;
+      }
+      
+      .padding{
+      
+        padding: 2rem !important;
+      }
+      
+      .card {
+          margin-bottom: 30px;
+          border: none;
+          -webkit-box-shadow: 0px 1px 2px 1px rgba(154, 154, 204, 0.22);
+          -moz-box-shadow: 0px 1px 2px 1px rgba(154, 154, 204, 0.22);
+          box-shadow: 0px 1px 2px 1px rgba(154, 154, 204, 0.22);
+      }
+      
+      .card-header {
+          background-color: #fff;
+          border-bottom: 1px solid #e6e6f2;
+      }
+      
+      h3 {
+          font-size: 20px;
+      }
+      
+      h5 {
+          font-size: 15px;
+          line-height: 26px;
+          color: #3d405c;
+          margin: 0px 0px 15px 0px;
+          font-family: 'Circular Std Medium';
+      }
+      
+      .text-dark {
+          color: #3d405c !important;
+      }
+      @media (max-width:768px){
+        #buyer {
+            margin-top: 15px;
+            }
+        }
+        @media print {
+            @page {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            body {
+                padding-top: 72px;
+                padding-bottom: 72px ;
+            }
+        }
+</style>
+</head>
+<body>
+<div id="pt">
+    <div class="container">
+        <div class="card mt-5">
+        <div class="d-flex justify-content-between">
+            <a href="{{ request.META.HTTP_REFERER }}" id="getBillArrow"><span class="material-symbols-outlined mt-2 ms-2" style="color:black;">arrow_back</span></a>
+            {% if payment == "1" or payment == "2" %}
+            <button onclick="myfun('pt')" id="getBillButton" class="btn btn-primary mt-2  me-2">Print</button>
+            {% endif %}
+            </div>
+        <div class="card-header pl-2">
+        <div class="float-right d-flex justify-content-between"><h6 class="mb-0">Invoice id : <strong>{{itemcode}}</strong></h6>
+        <h6 class="mb-0">Date: {{date}}</h6></div>
+    </div>
+    <div class="card-body">
+    <div class="row mb-4">
+    <div class="col-sm-6">
+    <h3 class="mb-2">Thank you! For Purchasing From .</h3>
+    <h3 class="mb-2">Buyer:</h3>
+    <h3 class="text-dark mb-1">{{custname}}</h3>
+    <div>Phone:{{custnumb}}</div>
+    {% if custemail %}<div>Email : {{custemail}}</div>{% endif %}
+    </div>
+    <div class="col-sm-6" id="buyer">
+    <h3 class="mb-2">Seller:</h3>
+    <h3 class="text-dark mb-1">Neon Wholesale Management System </h3>
+    <div>Nairobi, Kenya</div>
+    <div>Email: neonwholesale@gmail.com</div>
+    <div>Phone: +254 783812075</div>
+    </div>
+    </div>
+    <div class="table-responsive-sm">
+    <table class="table table-striped">
+    <thead>
+    <tr>
+    <th class="center">No.</th>
+    <th>Product Name</th>
+    <th>Product Size</th>
+    <th class="right">Price</th>
+    <th class="center">Qty</th>
+    <th class="right">Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in data %}
+    <tr>
+    <td class="center">{{forloop.counter}}</td>
+    <td class="left strong">{{item.itemname}}</td>
+    <td class="left strong">{{item.itemsize}}</td>
+    <td class="left strong">Ksh. {{item.itemprice}}</td>
+    <td class="left strong">{{item.itemquntity}}</td>
+    <td class="left strong">{{item.itemtotal}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+    </div>
+    <div class="row">
+    <div class="col-lg-8 col-sm-6">
+    </div>
+    <div class="col-lg-4 col-sm-6">
+    <table class="table table-clear">
+    <tbody>
+        <tr>
+            <td class="left">
+                <strong class="text-dark">Total</strong>
+            </td>
+            <td class="right text-end">Ksh. {{totalprice.total}}</td>
+        </tr>
+        <tr>
+            <td class="left">
+            <strong class="text-dark">Total Items</strong>
+            </td>
+            <td class="right text-end">{{totalitem.total}}</td>
+        </tr>
+        <tr>
+            <td class="left">
+            <strong class="text-dark">Discount</strong>
+            </td>
+            <td class="right text-end">Ksh. {{discount}}</td>
+        </tr>
+            <td class="left">
+            <strong class="text-dark">Total Pay</strong>
+            </td>
+            <td class="right text-end">Ksh. {{payprice}}</td>
+        </tr>
+    </tbody>
+    </table>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+<script type="text/javascript">
+    function myfun(pa){
+    var bk = document.body.innerHTML;
+    var dv = document.getElementById(pa).innerHTML;
+        document.body.innerHTML = dv;
+        var printButton = document.getElementById("getBillButton");
+        if (printButton) {
+            printButton.style.display = "none";
+        }
+        var ArrowButton = document.getElementById("getBillArrow");
+        if (ArrowButton) {
+            ArrowButton.style.display = "none";
+        }
+        window.print();
+        document.body.innerHTML = bk;
+    }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  </body>
+</html>

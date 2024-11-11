@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="content-wrapper">
+    {% include 'message.html' %}
+<div class="row">
+        <div class="col-md-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+            <h1 class="card-title fs-3 text-center">Add Product</h1>
+    <form action="{% url 'saveproduct' %}" id="product-form" method="POST">
+        {% csrf_token %}
+        <div class="form-group row mt-2 mb-0">
+            <div class="col-sm">
+                <div class="form-group mb-3">
+                    <label for="{{ form.name.id_for_label }}" class="control-label">{{form.name.label}}</label>
+                    {{form.name}}
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="form-group mb-3 ">
+                    <label for="{{ form.size.id_for_label }}" class="control-label">{{form.size.label}}</label>
+                    {{form.size}}
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="form-group mb-3 ">
+                    <label for="{{ form.price.id_for_label }}" class="control-label">{{form.price.label}}</label>
+                    {{form.price}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group row mt-2 mb-0">
+            <div class="col-sm">
+                <div class="form-group mb-3 ">
+                    <label for="{{ form.totalquantity.id_for_label }}" class="control-label">{{form.totalquantity.label}}</label>
+                    {{form.totalquantity}}
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="form-group mb-3 ">
+                    <label for="{{from.status.id_for_label}}" class="control-label">{{form.status.label}}</label>
+                    {{form.status}}
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="form-group mb-3">
+                    <label for="{{form.description.id_for_label}}" class="control-label">{{form.description.label}}</label>
+                    {{form.description}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group row mt-2 mb-0">
+            <div class="container text-center">
+                <button type="submit" id="add_to_list" class="btn btn-primary me-2 btn-md mt-4">Add Product</button>
+                </form>
+                </div>
+</div>
+</div>
+{% endblock body %}
+{% block script %}
+{% endblock script %}

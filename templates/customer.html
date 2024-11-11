@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block body %}
+    <div class="content-wrapper">
+    {% include 'message.html' %}
+    <div class="col-md-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title mb-0 text-center">List Of All Customers</h1>
+                <form method="get">
+                    <div class="form-group row mt-2 mb-0">
+                        <div class="col-sm">
+                        <div class="form-group mb-3">
+                            <label for="{{ filter.form.itemcode.id_for_label }}" class="control-label mb-0">{{ filter.form.itemcode.label }}</label>
+                            {{ filter.form.itemcode }}
+                        </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-group mb-3 ">
+                            <label for="{{ filter.form.payment.id_for_label }}" class="control-label mb-0">{{ filter.form.payment.label }}</label>
+                            {{ filter.form.payment }}
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-group mb-3 ">
+                                <label for="{{ filter.form.start_date.id_for_label }}" class="control-label mb-0">{{ filter.form.start_date.label }}</label>
+                                {{ filter.form.start_date }}
+                            </div>
+                        </div>
+                        <div class="col-sm">
+                            <div class="form-group mb-3 ">
+                            <label for="{{ filter.form.end_date.id_for_label }}" class="control-label mb-0">{{ filter.form.end_date.label }}</label>
+                            {{ filter.form.end_date }}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary">Search</button>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-hover text-center" id="product-tbl" name="product-tbl">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Customer Name</th>
+                                <th>Email</th>
+                                <th>Customer No.</th>
+                                <th>Total Item</th>
+                                <th>Total Price</th>
+                                <th>Discount</th>
+                                <th>Pay Price</th>
+                                <th>Item Code</th>
+                                <th>Payment</th>
+                                <th>Date Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {% for bill_item in customer %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ bill_item.custname }}</td>
+                                    <td>{{ bill_item.custemail }}</td>
+                                    <td>{{ bill_item.custnumb }}</td>
+                                    <td>{{ bill_item.totalitem }}</td>
+                                    <td>Ksh. {{ bill_item.totalprice|floatformat:2|intcomma }}</td>
+                                    <td>{{ bill_item.discount }}</td>
+                                    <td>Ksh. {{ bill_item.payprice|floatformat:2|intcomma }}</td>
+                                    <td>{{ bill_item.itemcode }}</td>
+                                    <td>{% if bill_item.payment == "1" %}<div class="badge badge-opacity-success"> Cash </div> {% elif bill_item.payment == "2" %}<div class="badge badge-opacity-warning"> Online </div> {% elif bill_item.payment == "3" %}<div class="badge badge-opacity-danger" style="background: #fedfdd;"> Pending </div>{% endif %}</td>
+                                    <td>{{ bill_item.date_created|date:"d-m-Y h:i A" }}</td>
+                                    <td>
+                                        <a class="btn btn-outline-info me-1 btn-sm" href="{% url 'editcustomer' bill_item.itemcode %}"><span class="mdi mdi-pencil"></span></a>
+                                        <a class="btn btn-outline-dark me-1 btn-sm" href="{% url 'viewpdf' bill_item.itemcode %}"><span class="mdi mdi-file-outline"></span></a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7">
+                                    <div class="pagination mt-2">
+                                    <ul class="pagination pagination-sm">
+                                        <li class="page-item">
+                                        {% if customer.has_previous %}
+                                        <a href="?page=1" class="page-link">&laquo;</a>
+                                        </li>
+                                        <li class="page-item">
+                                        <a href="?page={{ customer.previous_page_number }}" class="page-link">{{customer.previous_page_number}}</a>
+                                        </li>
+                                        {% endif %}
+                                        <li class="page-item active">
+                                        <span class="current-page page-link">{{ customer.number }}</span>
+                                        </li>
+                                        {% if customer.has_next %}
+                                        <li class="page-item">
+                                        <a href="?page={{ customer.next_page_number }}" class="page-link">{{ customer.next_page_number }}</a>
+                                        </li>
+                                        <li class="page-item">
+                                        <a href="?page={{ customer.paginator.num_pages }}" class="page-link">&raquo;</a>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
